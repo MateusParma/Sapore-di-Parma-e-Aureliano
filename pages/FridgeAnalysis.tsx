@@ -5,6 +5,7 @@ import { useApp } from '../context/AppContext';
 import { SuggestionResult, Recipe, Author, ChefHistoryItem, AiRecipeSuggestion, ChefMood, FridgeItem } from '../types';
 import { useNavigate, Link } from 'react-router-dom';
 import AiRecipeDetailModal from '../components/AiRecipeDetailModal';
+import LoadingPot from '../components/LoadingPot';
 
 const FridgeAnalysis = () => {
   const { addFridgeItems, addRecipe, addToShoppingList, addChefHistory, chefHistory } = useApp();
@@ -31,6 +32,9 @@ const FridgeAnalysis = () => {
 
   // Common State
   const [isProcessing, setIsProcessing] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState<string[]>([]); // Changed to array
+  const [loadingVariant, setLoadingVariant] = useState<'cooking' | 'searching'>('cooking');
+
   const [result, setResult] = useState<SuggestionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   
@@ -67,6 +71,13 @@ const FridgeAnalysis = () => {
     if (selectedImages.length === 0) return;
     
     setIsProcessing(true);
+    setLoadingVariant('searching');
+    setLoadingMessages([
+      "Espiando a geladeira...", 
+      "Olhando armários...", 
+      "Identificando potes misteriosos...", 
+      "Ajustando os óculos da IA..."
+    ]);
     setError(null);
     
     try {
@@ -85,6 +96,13 @@ const FridgeAnalysis = () => {
     if (!userPrompt.trim()) return;
     
     setIsProcessing(true);
+    setLoadingVariant('cooking');
+    setLoadingMessages([
+      "Pensando em receitas boas...", 
+      "Pedindo ajuda para os aliens...", 
+      "Consultando o livro da vovó...",
+      "Misturando sabores virtuais..."
+    ]);
     setError(null);
 
     try {
@@ -117,6 +135,14 @@ const FridgeAnalysis = () => {
   // Step 3: Generate Recipes from Verified List
   const handleGenerateRecipes = async () => {
     setIsProcessing(true);
+    setLoadingVariant('cooking');
+    setLoadingMessages([
+      "Acendendo o fogão virtual...",
+      "Pensando em umas receitas boas...",
+      "Pedindo ajuda para os aliens...",
+      "Não deixe o arroz queimar...",
+      "Espiando o livro da vovó..."
+    ]);
     setError(null);
 
     try {
@@ -186,7 +212,7 @@ const FridgeAnalysis = () => {
   };
 
   return (
-    <div className="space-y-6 pb-12 relative">
+    <div className="space-y-6 pb-12 relative interactive-zone">
       
       {/* Simple Header */}
       <div className="text-center max-w-lg mx-auto mb-6">
@@ -199,8 +225,19 @@ const FridgeAnalysis = () => {
         </p>
       </div>
 
+      {/* Processing Overlay */}
+      {isProcessing && (
+        <div className="fixed inset-0 z-[60] bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center animate-fade-in">
+           <LoadingPot 
+             size={150} 
+             messages={loadingMessages} 
+             variant={loadingVariant}
+           />
+        </div>
+      )}
+
       {/* Step 1: Input (Photos or Text) */}
-      {step === 'input' && (
+      {step === 'input' && !isProcessing && (
         <div className="animate-fade-in">
           {/* Mode Toggle */}
           <div className="flex justify-center gap-4 mb-6">
@@ -299,8 +336,8 @@ const FridgeAnalysis = () => {
                     disabled={isProcessing || selectedImages.length === 0}
                     className="bg-sage-600 text-white px-8 py-3 rounded-full font-hand font-bold text-xl shadow-lg hover:bg-sage-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 mx-auto"
                   >
-                    {isProcessing ? <span className="animate-spin">✨</span> : <Search size={20} />}
-                    {isProcessing ? 'Analisando...' : 'Identificar Ingredientes'}
+                    <Search size={20} />
+                    Identificar Ingredientes
                   </button>
                 </div>
               </>
@@ -318,8 +355,8 @@ const FridgeAnalysis = () => {
                     disabled={isProcessing || !userPrompt.trim()}
                     className="bg-sage-600 text-white px-8 py-3 rounded-full font-hand font-bold text-xl shadow-lg hover:bg-sage-700 disabled:opacity-50 transition-all flex items-center gap-2 mx-auto"
                   >
-                    {isProcessing ? <span className="animate-spin">✨</span> : <Send size={20} />}
-                    {isProcessing ? 'Criando...' : 'Enviar Pedido'}
+                    <Send size={20} />
+                    Enviar Pedido
                   </button>
                 </div>
               </div>
@@ -331,79 +368,91 @@ const FridgeAnalysis = () => {
       {/* Step 2: Verification Modal/Overlay */}
       {step === 'verification' && (
          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
-           <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh]">
-              
-              <div className="p-6 border-b border-sage-100 bg-sage-50 rounded-t-3xl">
-                <h3 className="font-hand font-bold text-2xl text-sage-800 flex items-center gap-2">
-                  <Check size={24} />
-                  Confirme os Ingredientes
-                </h3>
-                <p className="text-stone-500 text-sm mt-1">
-                  Encontrei estes itens. Adicione o que faltou ou remova erros antes de cozinhar!
-                </p>
+           
+           {/* Loading Overlay inside Verification if needed */}
+           {isProcessing ? (
+              <div className="bg-white w-full max-w-md p-10 rounded-3xl shadow-2xl flex flex-col items-center justify-center">
+                  <LoadingPot 
+                    size={120} 
+                    messages={loadingMessages} 
+                    variant={loadingVariant}
+                  />
               </div>
-
-              <div className="flex-1 overflow-y-auto p-6 bg-paper">
-                {/* Detected Items Grid */}
-                <div className="flex flex-wrap gap-2 mb-6">
-                   {detectedItems.map((item) => (
-                     <div key={item.id} className="flex items-center gap-2 bg-white border border-sage-200 pl-3 pr-1 py-1.5 rounded-full shadow-sm group hover:border-sage-400 transition-colors">
-                        <span className="font-hand font-bold text-stone-700">{item.name}</span>
-                        <button 
-                          onClick={() => removeVerificationItem(item.id)}
-                          className="p-1 text-stone-400 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-colors"
-                        >
-                          <X size={14} />
-                        </button>
-                     </div>
-                   ))}
-                   {detectedItems.length === 0 && (
-                      <p className="text-stone-400 italic font-hand">Nenhum item encontrado. Adicione manualmente abaixo.</p>
-                   )}
+           ) : (
+             <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh]">
+                
+                <div className="p-6 border-b border-sage-100 bg-sage-50 rounded-t-3xl">
+                  <h3 className="font-hand font-bold text-2xl text-sage-800 flex items-center gap-2">
+                    <Check size={24} />
+                    Confirme os Ingredientes
+                  </h3>
+                  <p className="text-stone-500 text-sm mt-1">
+                    Encontrei estes itens. Adicione o que faltou ou remova erros antes de cozinhar!
+                  </p>
                 </div>
 
-                {/* Add Manual Item */}
-                <form onSubmit={addVerificationItem} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newItemName}
-                    onChange={(e) => setNewItemName(e.target.value)}
-                    placeholder="Adicionar item (ex: Cebola)..."
-                    className="flex-1 px-4 py-2 rounded-xl border border-stone-200 focus:ring-2 focus:ring-sage-300 outline-none font-hand text-lg"
-                  />
+                <div className="flex-1 overflow-y-auto p-6 bg-paper">
+                  {/* Detected Items Grid */}
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {detectedItems.map((item) => (
+                      <div key={item.id} className="flex items-center gap-2 bg-white border border-sage-200 pl-3 pr-1 py-1.5 rounded-full shadow-sm group hover:border-sage-400 transition-colors">
+                          <span className="font-hand font-bold text-stone-700">{item.name}</span>
+                          <button 
+                            onClick={() => removeVerificationItem(item.id)}
+                            className="p-1 text-stone-400 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-colors"
+                          >
+                            <X size={14} />
+                          </button>
+                      </div>
+                    ))}
+                    {detectedItems.length === 0 && (
+                        <p className="text-stone-400 italic font-hand">Nenhum item encontrado. Adicione manualmente abaixo.</p>
+                    )}
+                  </div>
+
+                  {/* Add Manual Item */}
+                  <form onSubmit={addVerificationItem} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newItemName}
+                      onChange={(e) => setNewItemName(e.target.value)}
+                      placeholder="Adicionar item (ex: Cebola)..."
+                      className="flex-1 px-4 py-2 rounded-xl border border-stone-200 focus:ring-2 focus:ring-sage-300 outline-none font-hand text-lg"
+                    />
+                    <button 
+                      type="submit"
+                      disabled={!newItemName.trim()}
+                      className="bg-sage-100 text-sage-700 p-3 rounded-xl hover:bg-sage-200 disabled:opacity-50 transition-colors"
+                    >
+                      <Plus size={20} />
+                    </button>
+                  </form>
+                </div>
+
+                <div className="p-6 border-t border-sage-100 bg-white rounded-b-3xl flex justify-between items-center">
                   <button 
-                    type="submit"
-                    disabled={!newItemName.trim()}
-                    className="bg-sage-100 text-sage-700 p-3 rounded-xl hover:bg-sage-200 disabled:opacity-50 transition-colors"
+                    onClick={resetFlow}
+                    className="text-stone-400 hover:text-stone-600 font-hand font-bold text-lg px-4"
                   >
-                    <Plus size={20} />
+                    Voltar
                   </button>
-                </form>
-              </div>
+                  <button 
+                    onClick={handleGenerateRecipes}
+                    disabled={isProcessing || detectedItems.length === 0}
+                    className="bg-sage-600 text-white px-8 py-3 rounded-full font-hand font-bold text-xl shadow-lg hover:bg-sage-700 disabled:opacity-50 flex items-center gap-2"
+                  >
+                    <ChefHat size={20} />
+                    Criar Receitas
+                  </button>
+                </div>
 
-              <div className="p-6 border-t border-sage-100 bg-white rounded-b-3xl flex justify-between items-center">
-                <button 
-                  onClick={resetFlow}
-                  className="text-stone-400 hover:text-stone-600 font-hand font-bold text-lg px-4"
-                >
-                  Voltar
-                </button>
-                <button 
-                  onClick={handleGenerateRecipes}
-                  disabled={isProcessing || detectedItems.length === 0}
-                  className="bg-sage-600 text-white px-8 py-3 rounded-full font-hand font-bold text-xl shadow-lg hover:bg-sage-700 disabled:opacity-50 flex items-center gap-2"
-                >
-                   {isProcessing ? <span className="animate-spin">✨</span> : <ChefHat size={20} />}
-                   {isProcessing ? 'Cozinhando...' : 'Criar Receitas'}
-                </button>
-              </div>
-
-           </div>
+             </div>
+           )}
          </div>
       )}
 
       {/* Step 3: Results */}
-      {step === 'results' && result && (
+      {step === 'results' && result && !isProcessing && (
         <div className="animate-fade-in max-w-5xl mx-auto">
            
            <div className="flex justify-between items-center mb-6 px-2">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, ShoppingCart, Settings, HelpCircle, ChefHat, Heart, Flower, Bug } from 'lucide-react';
+import { Home, ShoppingCart, Settings, HelpCircle, ChefHat, Heart } from 'lucide-react';
+import BeeBackground from './BeeBackground';
 
 const Layout = ({ children }: { children?: React.ReactNode }) => {
   const location = useLocation();
@@ -18,24 +19,8 @@ const Layout = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className="min-h-screen bg-cream pb-24 md:pb-0 md:pl-64 relative overflow-x-hidden">
       
-      {/* Floating Decorative Background Elements */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-30">
-        <div className="absolute top-10 right-10 text-sage-300 animate-float">
-          <Bug size={32} />
-        </div>
-        <div className="absolute bottom-20 left-10 text-rose-300 animate-float-delayed">
-          <Heart size={24} fill="currentColor" />
-        </div>
-        <div className="absolute top-1/2 right-5 text-sage-200 animate-wiggle">
-          <Flower size={40} />
-        </div>
-        <div className="absolute bottom-10 right-1/4 text-sage-300 animate-float">
-          <Bug size={20} />
-        </div>
-        <div className="absolute top-32 left-8 text-rose-200 animate-float-delayed">
-           <Flower size={28} />
-        </div>
-      </div>
+      {/* Animated Interactive Background */}
+      <BeeBackground />
 
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex fixed top-0 left-0 h-full w-64 bg-white/90 backdrop-blur shadow-xl z-50 flex-col p-6 border-r border-sage-100">

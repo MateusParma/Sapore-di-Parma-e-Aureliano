@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext';
 import { Recipe, Author, Category } from '../types';
 import { ArrowLeft, Save, Plus, Trash2, Sparkles, Upload, Image as ImageIcon } from 'lucide-react';
 import { generateRecipeFromInput } from '../services/geminiService';
+import LoadingPot from '../components/LoadingPot';
 
 const AddEditRecipe = () => {
   const { id } = useParams();
@@ -115,7 +116,7 @@ const AddEditRecipe = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto pb-32 md:pb-8"> {/* Added padding bottom to prevent clipping */}
       <div className="flex items-center justify-between mb-6">
         <button onClick={() => navigate(-1)} className="text-stone-500 hover:text-stone-800 flex items-center gap-2">
           <ArrowLeft size={20} /> Cancelar
@@ -142,13 +143,21 @@ const AddEditRecipe = () => {
               type="button"
               onClick={handleAiGeneration}
               disabled={isGenerating}
-              className={`px-4 rounded-xl font-bold text-white transition-all flex items-center gap-2 ${
-                isGenerating ? 'bg-terracotta-300 cursor-wait' : 'bg-gradient-to-r from-purple-500 to-terracotta-500 hover:shadow-md'
+              className={`px-4 rounded-xl font-bold text-white transition-all flex items-center gap-2 overflow-hidden relative min-w-[120px] justify-center ${
+                isGenerating ? 'bg-sage-200 cursor-wait' : 'bg-gradient-to-r from-purple-500 to-terracotta-500 hover:shadow-md'
               }`}
               title="Preencher detalhes automaticamente com IA"
             >
-              {isGenerating ? <span className="animate-spin">✨</span> : <Sparkles size={18} />}
-              <span className="hidden md:inline">Mágica IA</span>
+              {isGenerating ? (
+                <div className="scale-50 absolute">
+                  <LoadingPot size={60} lightMode messages={["Mágica..."]} />
+                </div>
+              ) : (
+                <>
+                  <Sparkles size={18} />
+                  <span className="hidden md:inline">Mágica IA</span>
+                </>
+              )}
             </button>
           </div>
           <p className="text-xs text-stone-400 mt-1">Escreva o nome e clique no botão Mágica para a IA preencher o resto!</p>
