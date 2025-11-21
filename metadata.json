@@ -1,0 +1,7 @@
+{
+  "name": "Sapore di Parma e Aureliano",
+  "description": "Receitas e memórias da família. Sapore di Parma e Aureliano: organize, descubra e cozinhe com amor.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

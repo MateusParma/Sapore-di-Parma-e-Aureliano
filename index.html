@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sapore di Parma e Aureliano</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              hand: ['"Patrick Hand"', 'cursive'],
+              sans: ['"Nunito"', 'sans-serif'],
+            },
+            colors: {
+              cream: '#FDFBF7',
+              paper: '#FFFDF5',
+              // New Theme: Sage & Rose
+              sage: {
+                50: '#F4F7F4',
+                100: '#E8F0E8',
+                200: '#Cce0cc',
+                300: '#A3C2A3',
+                400: '#8FA88F', // Main
+                500: '#7A947A',
+                600: '#5C735C',
+                700: '#465946',
+              },
+              rose: {
+                50: '#FFF5F6',
+                100: '#FFE6E9',
+                200: '#FCCCD2',
+                300: '#FAA5B0',
+                400: '#F78092',
+                500: '#F0546E', // Heart color
+              },
+              stone: {
+                850: '#2D2A26', // Softer black
+              }
+            },
+            animation: {
+              'float': 'float 6s ease-in-out infinite',
+              'float-delayed': 'float 6s ease-in-out 3s infinite',
+              'wiggle': 'wiggle 3s ease-in-out infinite',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-10px)' },
+              },
+              wiggle: {
+                '0%, 100%': { transform: 'rotate(-3deg)' },
+                '50%': { transform: 'rotate(3deg)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6"
+  }
+}
+</script>
+<style>
+  body {
+    background-image: radial-gradient(#8FA88F 0.5px, transparent 0.5px);
+    background-size: 24px 24px;
+    background-color: #FDFBF7;
+  }
+</style>
+</head>
+  <body class="bg-cream text-stone-800 antialiased selection:bg-sage-200">
+    <div id="root"></div>
+  </body>
+</html>
